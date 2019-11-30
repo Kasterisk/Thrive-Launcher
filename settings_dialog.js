@@ -14,6 +14,8 @@ const {listInstalledVersions, deleteInstalledVersion} = require("./install_handl
 
 const {settings, saveSettings, resetSettings, defaultInstallPath} = require("./settings.js");
 
+const {Progress} = require("./progress");
+
 const settingsModal = new Modal("settingsModal", "settingsModalDialog",
     {closeButton: "settingsClose"});
 
@@ -88,7 +90,9 @@ function updateInstalledVersions(){
     });
 }
 
-async function moveInstalledFiles(files, destination){
+function moveInstalledFiles(files, destination){
+    const moveProgress = Progress("move");
+
     movingFileModal.show();
     const content = document.getElementById("movingFileModalContent");
 
@@ -97,8 +101,12 @@ async function moveInstalledFiles(files, destination){
     content.append(document.createTextNode("This may take several minutes, " +
                                            "please be patient."));
 
-    await Promise.all(files.map((file) =>
+    Promise.all(files.map((file) =>
         fsExtra.move(file, path.join(destination, path.basename(file))).then(() => {
+            const out = fs.createWriteStream(path.join(destination, path.basename(file)));
+
+            
+
             console.log("moved: " + path.basename(file));
         } ))).
         then(() =>{
