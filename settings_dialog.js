@@ -2,8 +2,6 @@
 "use strict";
 
 const fs = require("fs");
-const fsExtra = require("fs-extra");
-const path = require("path");
 
 const {shell} = require("electron");
 const {dialog} = require("electron").remote;
@@ -14,13 +12,10 @@ const {listInstalledVersions, deleteInstalledVersion} = require("./install_handl
 
 const {settings, saveSettings, resetSettings, defaultInstallPath} = require("./settings.js");
 
-const {Progress} = require("./progress");
+const {moveInstalledFiles} = require("./move_files.js");
 
 const settingsModal = new Modal("settingsModal", "settingsModalDialog",
     {closeButton: "settingsClose"});
-
-const movingFileModal = new Modal("movingFileModal", "movingFileModalDialog",
-    {autoClose: false});
 
 // Used to skip callbacks on loading settings
 let loadingSettings = false;
@@ -88,39 +83,6 @@ function updateInstalledVersions(){
         li.textContent = "An error happened: " + err;
         listOfInstalledVersions.append(li);
     });
-}
-
-function moveInstalledFiles(files, destination){
-    const moveProgress = Progress("move");
-
-    movingFileModal.show();
-    const content = document.getElementById("movingFileModalContent");
-
-    content.textContent = "Moving files to: " + destination + " ...";
-    content.append(document.createElement("br"));
-    content.append(document.createTextNode("This may take several minutes, " +
-                                           "please be patient."));
-
-    Promise.all(files.map((file) =>
-        fsExtra.move(file, path.join(destination, path.basename(file))).then(() => {
-            const out = fs.createWriteStream(path.join(destination, path.basename(file)));
-
-            
-
-            console.log("moved: " + path.basename(file));
-        } ))).
-        then(() =>{
-            console.log("successfully moved all the files");
-
-            settings.installPath = destination;
-            onSettingsChanged();
-            updateInstalledVersions();
-            movingFileModal.hide();
-        }).
-        catch((err) => {
-            movingFileModal.hide();
-            showGenericError("Failed to move file(s): " + err.message);
-        });
 }
 
 settingsButton.addEventListener("click", function(){
@@ -192,7 +154,11 @@ function changeInstallLocation(directory){
         dialog.showMessageBox(win, options, (response) => {
             if(response == 0){
                 if(settings.installPath != directory){
-                    moveInstalledFiles(files, directory);
+                    moveInstalledFiles(files, directory).then(() => {
+                        settings.installPath = directory;
+                        onSettingsChanged();
+                        updateInstalledVersions();
+                    });
                 }
             }
             if(response == 1){
