@@ -134,8 +134,6 @@ function changeInstallLocation(directory){
         }
 
         if (!Array.isArray(files) || !files.length) {
-            console.log("No files found");
-
             settings.installPath = directory;
             onSettingsChanged();
             updateInstalledVersions();

@@ -1,3 +1,6 @@
+/**
+ * Helpers for moving installed thrive files.
+ */
 "use strict"
 
 const fsExtra = require("fs-extra");
@@ -6,6 +9,7 @@ const path = require("path");
 const {Progress} = require("./progress");
 const {formatBytes} = require("./utils");
 
+const {Modal, showGenericError} = require("./modal");
 const movingFileModal = new Modal("movingFileModal", "movingFileModalDialog",
     {autoClose: false});
 
@@ -34,21 +38,29 @@ const getTotalSize = function(directoryPath) {
         totalSize += fsExtra.statSync(filePath).size;
     })
    
-    return formatBytes(totalSize);
+    return totalSize;
 }
 
 function moveInstalledFiles(files, destination){
     return new Promise((resolve, reject) => {
         let finished = false;
 
-        let result = getTotalSize(String(files));
+        let totalVersionsSize = 0;
+
+        files.forEach(function(file) {
+            let result = getTotalSize(String(file));
+            console.log(file + " size: " + result);
+            totalVersionsSize += result;
+        });
+
+        console.log("Total versions size: " + formatBytes(totalVersionsSize));
 
         movingFileModal.show();
         const content = document.getElementById("movingFileModalContent");
     
         content.textContent = "Moving files to: " + destination + " ...";
         content.append(document.createElement("br"));
-        content.append(document.createTextNode("Total size: " + result));
+        content.append(document.createTextNode("Total size: " + formatBytes(totalVersionsSize)));
         content.append(document.createElement("br"));
         content.append(document.createTextNode("This may take several minutes, " +
                                                "please be patient."));

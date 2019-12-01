@@ -1087,7 +1087,7 @@ playButtonText.addEventListener("click", function(){
         box.append(document.createElement("br"));
         box.append(document.createElement("br"));
 
-        box.append(document.createTextNode("Detected graphics card(s):" + cardsModel));
+        box.append(document.createTextNode("Found graphics card(s):" + cardsModel));
 
         // Shows the help text if a non-Intel card is detected
         if(showHelpText){
