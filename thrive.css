@@ -574,16 +574,17 @@ input[type="text"].Report {
 
 .loading-ring {
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   mix-blend-mode: difference;
 }
+
 .loading-ring:after {
   content: " ";
   display: block;
-  width: 20px;
-  height: 20px;
-  margin: 8px;
+  width: 15px;
+  height: 15px;
+  margin-left: 10px;
   border-radius: 50%;
   border: 6px solid #fff;
   border-color: #fff transparent #fff transparent;
