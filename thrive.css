@@ -60,6 +60,7 @@ hr.style2 {
 /* News boxes */
 .ContentBlock {
   overflow: auto;
+  overflow-x: hidden;
   display: inline-block;
   height: auto;
   width: auto;
@@ -569,4 +570,30 @@ input[type="text"].Report {
   padding: 4px 5px;
   position: absolute;
   top: 0;
+}
+
+.loading-ring {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  mix-blend-mode: difference;
+}
+.loading-ring:after {
+  content: " ";
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: loading-ring 1.2s linear infinite;
+}
+@keyframes loading-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

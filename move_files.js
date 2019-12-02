@@ -6,7 +6,6 @@
 const fsExtra = require("fs-extra");
 const path = require("path");
 
-const {Progress} = require("./progress");
 const {formatBytes} = require("./utils");
 
 const {Modal, showGenericError} = require("./modal");
@@ -58,7 +57,7 @@ function moveInstalledFiles(files, destination){
         movingFileModal.show();
         const content = document.getElementById("movingFileModalContent");
     
-        content.textContent = "Moving files to: " + destination + " ...";
+        content.innerHTML = "Moving files to " + destination + "<div class='loading-ring'></div>";
         content.append(document.createElement("br"));
         content.append(document.createTextNode("Total size: " + formatBytes(totalVersionsSize)));
         content.append(document.createElement("br"));
