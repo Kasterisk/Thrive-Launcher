@@ -1,5 +1,5 @@
 /**
- * Helpers for moving installed thrive files.
+ * Helpers for moving installed Thrive files.
  */
 "use strict"
 
@@ -15,7 +15,7 @@ const movingFileModal = new Modal("movingFileModal", "movingFileModalDialog", {
 
 /**
  * Check all subdirectories and files recursively
- * And add them to an array of files
+ * And add them to an array.
 */
 const getAllFiles = function(dirPath, arrayOfFiles) {
     const files = fsExtra.readdirSync(dirPath);
@@ -33,7 +33,10 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
     return arrayOfFiles;
 }
 
-/* Combine all of the file sizes from the array */
+/**
+ * call getAllFiles() then combine all of the
+ * file sizes from the array.
+*/
 const getTotalSize = function(directoryPath) {
     const arrayOfFiles = getAllFiles(directoryPath);
    
@@ -46,7 +49,9 @@ const getTotalSize = function(directoryPath) {
     return totalSize;
 }
 
-/* Move the requested files with promise */
+/**
+ * Move the requested files and returns a promise.
+*/
 function moveInstalledFiles(files, destination){
     return new Promise((resolve, reject) => {
         let totalVersionsSize = 0;
@@ -75,12 +80,16 @@ function moveInstalledFiles(files, destination){
         ring.classList.add("loading-ring");
         content.append(ring);
 
+        // To track number of files sucessfully moved
+        let nFiles = files.length;
+
         // Move process
         Promise.all(files.map((file) =>
         fsExtra.move(file, path.join(destination, path.basename(file))).then(() => {
+            nFiles -= 1;
             console.log("moved: " + path.basename(file));
-        } ))).
-        then(() =>{
+        } )))
+        .then(() =>{
             content.textContent = "Finished moving (" + files.length + ") items.";
 
             // Only create the close button after finished
@@ -99,10 +108,10 @@ function moveInstalledFiles(files, destination){
             content.append(closeContainer);
             
             resolve();
-        }).
-        catch((err) => {
+        })
+        .catch((err) => {
             movingFileModal.hide();
-            showGenericError("Failed to move file(s): " + err.message);
+            showGenericError("Failed to move (" + nFiles + ") items: " + err.message);
             reject(err);
         });
     });
